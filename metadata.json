@@ -1,0 +1,6 @@
+{
+  "name": "COFFEE LHARDY — Champs-Élysées, Paris",
+  "description": "Votre pause café au cœur des Champs-Élysées. Découvrez notre carte de cafés de spécialité, boissons signatures, pâtisseries artisanales et notre espace parisien.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
