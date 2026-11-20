@@ -8,6 +8,10 @@ import {
 } from '../data/coffeeData';
 import { CoffeeBranchDivider } from './CoffeeDecor';
 import { ImageWithFallback } from './ImageWithFallback';
+import {
+  getItemAtmosphere,
+  MenuPhotoAtmosphere,
+} from './MenuPhotoAtmosphere';
 
 type CategoryId = Exclude<MenuCategoryId, 'all'>;
 
@@ -126,14 +130,17 @@ export function MenuSection() {
 
         {/* Visual Showcase using supplied product photo */}
         <div className="max-w-3xl mx-auto mb-12">
-          <figure className="rounded-xl overflow-hidden border border-[#C7D8CA] bg-[#F7FAF7]">
-            <div className="aspect-[16/10] overflow-hidden bg-[#EFE9E0]">
-              <ImageWithFallback
-                src={SHOP_PHOTOS.drinksAndPastries}
-                alt="Matcha latte, boissons chaudes à emporter, brioche feuilletée, brownie et cookie"
-                loading="lazy"
-                className="w-full h-full object-cover object-center"
-              />
+          <figure className="group rounded-xl overflow-hidden border border-[#C7D8CA] bg-[#F7FAF7]">
+            <div className="menu-photo-frame relative aspect-[16/10] overflow-hidden bg-[#EFE9E0]">
+              <div className="w-full h-full menu-photo-drift-a">
+                <ImageWithFallback
+                  src={SHOP_PHOTOS.drinksAndPastries}
+                  alt="Matcha latte, boissons chaudes à emporter, brioche feuilletée, brownie et cookie"
+                  loading="lazy"
+                  className="w-full h-full object-cover object-center transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+                />
+              </div>
+              <MenuPhotoAtmosphere mode="hot-drink" variantIndex={0} />
             </div>
             <figcaption className="px-5 py-3.5 text-sm sm:text-base text-[#3D5A45] font-medium border-t border-[#D6E3D8] text-center">
               Au comptoir, Jérémy, barista&nbsp;expert,
@@ -224,49 +231,66 @@ export function MenuSection() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {items.map((item) => (
-                    <div
-                      key={item.id}
-                      className={`p-4 sm:p-5 rounded-xl border transition-all duration-200 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5 ${theme.cardBg} ${theme.cardBorder} ${
-                        category.id === 'signature-drinks'
-                          ? 'gold-shimmer-card'
-                          : ''
-                      }`}
-                    >
-                      <div
-                        className={`w-full aspect-[4/3] sm:aspect-square sm:w-36 sm:h-36 lg:w-40 lg:h-40 shrink-0 rounded-lg overflow-hidden border-2 bg-[#EFE9E0] ${theme.thumbBorder}`}
-                      >
-                        <ImageWithFallback
-                          src={item.image}
-                          alt={item.imageAlt}
-                          loading="lazy"
-                          className="w-full h-full object-cover object-center"
-                        />
-                      </div>
+                  {items.map((item, itemIdx) => {
+                    const driftClass =
+                      itemIdx % 2 === 0
+                        ? 'menu-photo-drift-a'
+                        : 'menu-photo-drift-b';
+                    const driftDelayClass = `menu-drift-delay-${itemIdx % 5}`;
+                    const enterDelayClass = `menu-enter-delay-${itemIdx % 6}`;
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-baseline justify-between gap-3">
-                          <h4 className="text-base sm:text-lg font-medium text-[#231915]">
-                            {item.name}
-                          </h4>
-                          <span
-                            className={`text-base sm:text-lg font-semibold tabular-nums whitespace-nowrap shrink-0 ${theme.priceColor}`}
-                          >
-                            {item.priceEur}
-                          </span>
-                        </div>
-                        <p
-                          className={`text-sm mt-1.5 leading-relaxed ${
-                            category.id === 'signature-drinks'
-                              ? 'text-[#3E2C1E]'
-                              : 'text-[#5A4D44]'
-                          }`}
+                    return (
+                      <div
+                        key={`${activeCategory}-${item.id}`}
+                        className={`group menu-card-enter ${enterDelayClass} p-4 sm:p-5 rounded-xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5 ${theme.cardBg} ${theme.cardBorder} ${
+                          category.id === 'signature-drinks'
+                            ? 'gold-shimmer-card'
+                            : ''
+                        }`}
+                      >
+                        <div
+                          className={`menu-photo-frame relative w-full aspect-[4/3] sm:aspect-square sm:w-36 sm:h-36 lg:w-40 lg:h-40 shrink-0 rounded-lg overflow-hidden border-2 bg-[#EFE9E0] ${theme.thumbBorder}`}
                         >
-                          {item.description}
-                        </p>
+                          <div
+                            className={`w-full h-full ${driftClass} ${driftDelayClass}`}
+                          >
+                            <ImageWithFallback
+                              src={item.image}
+                              alt={item.imageAlt}
+                              loading="lazy"
+                              className="w-full h-full object-cover object-center transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108"
+                            />
+                          </div>
+                          <MenuPhotoAtmosphere
+                            mode={getItemAtmosphere(category.id, item.id)}
+                            variantIndex={itemIdx}
+                          />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-baseline justify-between gap-3">
+                            <h4 className="text-base sm:text-lg font-medium text-[#231915]">
+                              {item.name}
+                            </h4>
+                            <span
+                              className={`text-base sm:text-lg font-semibold tabular-nums whitespace-nowrap shrink-0 ${theme.priceColor}`}
+                            >
+                              {item.priceEur}
+                            </span>
+                          </div>
+                          <p
+                            className={`text-sm mt-1.5 leading-relaxed ${
+                              category.id === 'signature-drinks'
+                                ? 'text-[#3E2C1E]'
+                                : 'text-[#5A4D44]'
+                            }`}
+                          >
+                            {item.description}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             );

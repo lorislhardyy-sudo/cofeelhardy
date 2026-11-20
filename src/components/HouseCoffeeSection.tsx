@@ -1,6 +1,12 @@
 import { useState } from 'react';
-import { Check, ShoppingBag } from 'lucide-react';
-import { formatEur, useCart } from '../context/CartContext';
+import { Check, RefreshCw, ShoppingBag } from 'lucide-react';
+import {
+  formatEur,
+  getSubscriptionPrice,
+  PurchaseType,
+  SUBSCRIPTION_DISCOUNT_LABEL,
+  useCart,
+} from '../context/CartContext';
 import {
   CoffeeGrind,
   CoffeeWeight,
@@ -20,13 +26,22 @@ const GRIND_OPTIONS: { value: CoffeeGrind; label: string }[] = [
 interface SelectionState {
   weight: CoffeeWeight;
   grind: CoffeeGrind;
+  purchaseType: PurchaseType;
 }
 
 export function HouseCoffeeSection() {
   const { addItem } = useCart();
   const [selections, setSelections] = useState<Record<string, SelectionState>>({
-    'assemblage-maison': { weight: '250g', grind: 'En grains' },
-    'reserve-royale': { weight: '250g', grind: 'En grains' },
+    'assemblage-maison': {
+      weight: '250g',
+      grind: 'En grains',
+      purchaseType: 'one-time',
+    },
+    'reserve-royale': {
+      weight: '250g',
+      grind: 'En grains',
+      purchaseType: 'one-time',
+    },
   });
   const [justAddedId, setJustAddedId] = useState<string | null>(null);
 
@@ -47,14 +62,23 @@ export function HouseCoffeeSection() {
     const sel = selections[coffee.id] ?? {
       weight: '250g',
       grind: 'En grains',
+      purchaseType: 'one-time',
     };
+    const regularPrice = coffee.prices[sel.weight];
+    const unitPrice =
+      sel.purchaseType === 'subscription'
+        ? getSubscriptionPrice(regularPrice)
+        : regularPrice;
+
     addItem({
       coffeeId: coffee.id,
       name: coffee.name,
       image: coffee.image,
       weight: sel.weight,
       grind: sel.grind,
-      unitPrice: coffee.prices[sel.weight],
+      purchaseType: sel.purchaseType,
+      unitPrice,
+      regularUnitPrice: regularPrice,
     });
 
     setJustAddedId(coffee.id);
@@ -84,10 +108,11 @@ export function HouseCoffeeSection() {
             Cafés Maison · 18 rue&nbsp;Royale
           </p>
           <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-[#FAF4EC]">
-            Nos sachets à emporter
+            Nos sachets à l’unité ou par&nbsp;abonnement
           </h2>
           <p className="text-base text-[#DDD0C3] mt-2.5">
-            En grains ou moulus à la demande au&nbsp;comptoir.
+            En grains ou moulus à la demande. Abonnement mensuel à{' '}
+            {SUBSCRIPTION_DISCOUNT_LABEL}, sans&nbsp;engagement.
           </p>
         </div>
 
@@ -97,8 +122,13 @@ export function HouseCoffeeSection() {
             const sel = selections[coffee.id] ?? {
               weight: '250g',
               grind: 'En grains',
+              purchaseType: 'one-time',
             };
-            const currentPrice = coffee.prices[sel.weight];
+            const regularPrice = coffee.prices[sel.weight];
+            const isSub = sel.purchaseType === 'subscription';
+            const currentPrice = isSub
+              ? getSubscriptionPrice(regularPrice)
+              : regularPrice;
             const isAdded = justAddedId === coffee.id;
 
             return (
@@ -128,9 +158,21 @@ export function HouseCoffeeSection() {
                       <h3 className="font-serif text-2xl sm:text-3xl font-semibold text-[#231915]">
                         {coffee.name}
                       </h3>
-                      <span className="text-xl sm:text-2xl font-semibold text-[#5E3A22] tabular-nums whitespace-nowrap shrink-0">
-                        {formatEur(currentPrice)}
-                      </span>
+                      <div className="text-right shrink-0">
+                        {isSub && (
+                          <span className="text-xs text-[#8C7F74] line-through tabular-nums mr-2">
+                            {formatEur(regularPrice)}
+                          </span>
+                        )}
+                        <span className="text-xl sm:text-2xl font-semibold text-[#5E3A22] tabular-nums whitespace-nowrap">
+                          {formatEur(currentPrice)}
+                        </span>
+                        {isSub && (
+                          <span className="text-xs font-medium text-[#5A4D44] ml-1">
+                            / mois
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <p className="text-sm text-[#5A4D44] mt-2">
@@ -138,8 +180,50 @@ export function HouseCoffeeSection() {
                     </p>
                   </div>
 
-                  {/* Format & Grind Selectors + Add to Cart CTA */}
+                  {/* Purchase Mode, Format, Grind & CTA */}
                   <div className="space-y-3">
+                    {/* One-time vs Monthly Subscription Selector */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateSelection(coffee.id, {
+                            purchaseType: 'one-time',
+                          })
+                        }
+                        className={`py-2 px-3 text-xs sm:text-sm font-medium rounded-lg border transition-colors duration-150 whitespace-nowrap cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B2314] ${
+                          !isSub
+                            ? 'bg-[#3B2314] text-[#FAF4EC] border-[#3B2314]'
+                            : 'bg-[#F2EAE0] text-[#5A4D44] border-[#DFD1BF] hover:text-[#231915] hover:border-[#B89D7F]'
+                        }`}
+                      >
+                        Achat unique
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateSelection(coffee.id, {
+                            purchaseType: 'subscription',
+                          })
+                        }
+                        className={`py-2 px-3 text-xs sm:text-sm font-medium rounded-lg border transition-colors duration-150 inline-flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B2314] ${
+                          isSub
+                            ? 'bg-[#3D5A45] text-[#FAF8F5] border-[#3D5A45]'
+                            : 'bg-[#F2EAE0] text-[#3D5A45] border-[#C7D8CA] hover:border-[#3D5A45]'
+                        }`}
+                      >
+                        <RefreshCw className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                        <span>Abonnement {SUBSCRIPTION_DISCOUNT_LABEL}</span>
+                      </button>
+                    </div>
+
+                    {isSub && (
+                      <p className="text-xs font-medium text-[#3D5A45]">
+                        Livraison offerte chaque mois · Sans engagement
+                      </p>
+                    )}
+
                     <div className="grid grid-cols-3 gap-2">
                       {WEIGHT_OPTIONS.map((weight) => {
                         const active = sel.weight === weight;
@@ -195,6 +279,13 @@ export function HouseCoffeeSection() {
                         <>
                           <Check className="w-4 h-4" aria-hidden="true" />
                           <span>Ajouté au panier</span>
+                        </>
+                      ) : isSub ? (
+                        <>
+                          <RefreshCw className="w-4 h-4" aria-hidden="true" />
+                          <span>
+                            S’abonner · {formatEur(currentPrice)} / mois
+                          </span>
                         </>
                       ) : (
                         <>

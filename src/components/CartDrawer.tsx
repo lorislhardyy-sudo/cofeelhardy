@@ -53,6 +53,8 @@ export function CartDrawer() {
     fulfillment,
     lastOrder,
     totalCount,
+    hasSubscription,
+    monthlyRecurringTotal,
     subtotal,
     shippingFee,
     total,
@@ -83,14 +85,16 @@ export function CartDrawer() {
     }
   }, [isOpen, lastOrder, items.length, step]);
 
-  // Keep payment method valid when switching between pickup and delivery
+  // Keep payment method logical when switching fulfillment or having subscriptions
   useEffect(() => {
-    if (fulfillment === 'pickup' && paymentMethod === 'cod') {
+    if (hasSubscription && fulfillment !== 'pickup' && paymentMethod !== 'card') {
+      setPaymentMethod('card');
+    } else if (fulfillment === 'pickup' && paymentMethod === 'cod') {
       setPaymentMethod('counter');
     } else if (fulfillment !== 'pickup' && paymentMethod === 'counter') {
       setPaymentMethod('card');
     }
-  }, [fulfillment, paymentMethod]);
+  }, [fulfillment, paymentMethod, hasSubscription]);
 
   // Escape key closes drawer
   useEffect(() => {
@@ -200,20 +204,23 @@ export function CartDrawer() {
   const buildOrderEmailHref = () => {
     if (!lastOrder) return `mailto:${BRAND_CONTACT.email}`;
     const subject = encodeURIComponent(
-      `Commande ${lastOrder.orderNumber} — COFFEE LHARDY`
+      `${lastOrder.hasSubscription ? 'Abonnement & Commande' : 'Commande'} ${lastOrder.orderNumber} — COFFEE LHARDY`
     );
     const itemsText = lastOrder.items
       .map(
         (item) =>
-          `- ${item.quantity} × ${item.name} (${item.weight === '1kg' ? '1 kg' : item.weight.replace('g', ' g')}, ${item.grind}) : ${formatEur(item.unitPrice * item.quantity)}`
+          `- ${item.quantity} × ${item.name} (${item.weight === '1kg' ? '1 kg' : item.weight.replace('g', ' g')}, ${item.grind}${item.purchaseType === 'subscription' ? ', Abonnement mensuel -15 %' : ''}) : ${formatEur(item.unitPrice * item.quantity)}${item.purchaseType === 'subscription' ? ' / mois' : ''}`
       )
       .join('\n');
     const addressBlock =
       lastOrder.fulfillment === 'pickup'
         ? `Créneau de retrait : ${lastOrder.customer.pickupSlot}`
         : `Adresse de livraison : ${lastOrder.customer.address}, ${lastOrder.customer.postalCode} ${lastOrder.customer.city}`;
+    const subLine = lastOrder.hasSubscription
+      ? `\nAbonnement mensuel sans engagement : ${formatEur(lastOrder.monthlyRecurringTotal)} / mois`
+      : '';
     const body = encodeURIComponent(
-      `Commande ${lastOrder.orderNumber} (${lastOrder.createdAt})\nClient : ${lastOrder.customer.fullName}\nTél : ${lastOrder.customer.phone}\nE-mail : ${lastOrder.customer.email}\n\nArticles :\n${itemsText}\n\nMode : ${fulfillmentLabel(lastOrder.fulfillment)}\n${addressBlock}\nRèglement : ${paymentLabel(lastOrder.paymentMethod)}\nTotal : ${formatEur(lastOrder.total)}${lastOrder.customer.notes ? `\nNote : ${lastOrder.customer.notes}` : ''}`
+      `Commande ${lastOrder.orderNumber} (${lastOrder.createdAt})\nClient : ${lastOrder.customer.fullName}\nTél : ${lastOrder.customer.phone}\nE-mail : ${lastOrder.customer.email}\n\nArticles :\n${itemsText}\n\nMode : ${fulfillmentLabel(lastOrder.fulfillment)}\n${addressBlock}\nRèglement : ${paymentLabel(lastOrder.paymentMethod)}\nTotal aujourd'hui : ${formatEur(lastOrder.total)}${subLine}${lastOrder.customer.notes ? `\nNote : ${lastOrder.customer.notes}` : ''}`
     );
     return `mailto:${BRAND_CONTACT.email}?subject=${subject}&body=${body}`;
   };
@@ -338,7 +345,12 @@ export function CartDrawer() {
                 <div className="space-y-6">
                   {/* Free Shipping Progress */}
                   <div className="p-3.5 rounded-xl bg-[#F2EAE0] border border-[#E2D4C3] text-xs text-[#5A4D44]">
-                    {freeShippingRemaining > 0 ? (
+                    {hasSubscription ? (
+                      <span className="font-medium text-[#3D5A45]">
+                        Livraison Colissimo offerte incluse avec votre
+                        abonnement mensuel.
+                      </span>
+                    ) : freeShippingRemaining > 0 ? (
                       <span>
                         Plus que{' '}
                         <strong className="text-[#5E3A22] tabular-nums">
@@ -378,6 +390,12 @@ export function CartDrawer() {
                                   ? '1 kg'
                                   : item.weight.replace('g', ' g')}{' '}
                                 · {item.grind}
+                                {item.purchaseType === 'subscription' && (
+                                  <span className="text-[#3D5A45] font-medium">
+                                    {' '}
+                                    · Abonnement mensuel
+                                  </span>
+                                )}
                               </p>
                             </div>
                             <button
@@ -415,6 +433,12 @@ export function CartDrawer() {
 
                             <span className="text-base font-semibold text-[#5E3A22] tabular-nums">
                               {formatEur(item.unitPrice * item.quantity)}
+                              {item.purchaseType === 'subscription' && (
+                                <span className="text-xs font-normal text-[#5A4D44]">
+                                  {' '}
+                                  / mois
+                                </span>
+                              )}
                             </span>
                           </div>
                         </div>
@@ -442,8 +466,11 @@ export function CartDrawer() {
                             id: 'colissimo',
                             icon: Truck,
                             title: 'Livraison Colissimo · France',
-                            desc: 'Expédition sous 24h – 48h',
+                            desc: hasSubscription
+                              ? 'Offerte chaque mois pour les abonnés'
+                              : 'Expédition sous 24h – 48h',
                             price:
+                              hasSubscription ||
                               subtotal >= FREE_SHIPPING_THRESHOLD
                                 ? 'Offerte'
                                 : '4,90 €',
@@ -685,7 +712,13 @@ export function CartDrawer() {
                   Mode de règlement
                 </h3>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div
+                  className={`grid grid-cols-1 ${
+                    hasSubscription && fulfillment !== 'pickup'
+                      ? ''
+                      : 'sm:grid-cols-2'
+                  } gap-2.5`}
+                >
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('card')}
@@ -700,7 +733,9 @@ export function CartDrawer() {
                       aria-hidden="true"
                     />
                     <span className="text-sm font-medium text-[#231915]">
-                      Carte bancaire
+                      {hasSubscription
+                        ? 'Carte bancaire · Renouvellement mensuel'
+                        : 'Carte bancaire'}
                     </span>
                   </button>
 
@@ -719,27 +754,31 @@ export function CartDrawer() {
                         aria-hidden="true"
                       />
                       <span className="text-sm font-medium text-[#231915]">
-                        Payer au comptoir
+                        {hasSubscription
+                          ? 'Régler au comptoir chaque mois'
+                          : 'Payer au comptoir'}
                       </span>
                     </button>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod('cod')}
-                      className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-colors cursor-pointer ${
-                        paymentMethod === 'cod'
-                          ? 'bg-[#EFE3D2] border-[#5E3A22]'
-                          : 'bg-white border-[#DFD1BF] hover:border-[#B89D7F]'
-                      }`}
-                    >
-                      <Truck
-                        className="w-4 h-4 text-[#3D5A45] shrink-0"
-                        aria-hidden="true"
-                      />
-                      <span className="text-sm font-medium text-[#231915]">
-                        À la livraison
-                      </span>
-                    </button>
+                    !hasSubscription && (
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod('cod')}
+                        className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-colors cursor-pointer ${
+                          paymentMethod === 'cod'
+                            ? 'bg-[#EFE3D2] border-[#5E3A22]'
+                            : 'bg-white border-[#DFD1BF] hover:border-[#B89D7F]'
+                        }`}
+                      >
+                        <Truck
+                          className="w-4 h-4 text-[#3D5A45] shrink-0"
+                          aria-hidden="true"
+                        />
+                        <span className="text-sm font-medium text-[#231915]">
+                          À la livraison
+                        </span>
+                      </button>
+                    )
                   )}
                 </div>
 
@@ -749,7 +788,9 @@ export function CartDrawer() {
                       <span>Visa · Mastercard · CB</span>
                       <span className="inline-flex items-center gap-1 text-[#3D5A45] font-medium">
                         <Lock className="w-3 h-3" aria-hidden="true" />
-                        Transaction sécurisée
+                        {hasSubscription
+                          ? 'Sans engagement · Résiliable en 1 clic'
+                          : 'Transaction sécurisée'}
                       </span>
                     </div>
 
@@ -885,11 +926,16 @@ export function CartDrawer() {
                           {item.weight === '1kg'
                             ? '1 kg'
                             : item.weight.replace('g', ' g')}
-                          , {item.grind})
+                          , {item.grind}
+                          {item.purchaseType === 'subscription'
+                            ? ' · Abonnement mensuel'
+                            : ''}
+                          )
                         </span>
                       </span>
                       <span className="font-medium text-[#5E3A22] tabular-nums shrink-0">
                         {formatEur(item.unitPrice * item.quantity)}
+                        {item.purchaseType === 'subscription' ? ' / mois' : ''}
                       </span>
                     </li>
                   ))}
@@ -908,8 +954,16 @@ export function CartDrawer() {
                       {paymentLabel(lastOrder.paymentMethod)}
                     </span>
                   </div>
+                  {lastOrder.hasSubscription && (
+                    <div className="flex justify-between text-[#3D5A45] font-medium">
+                      <span>Renouvellement mensuel</span>
+                      <span className="tabular-nums">
+                        {formatEur(lastOrder.monthlyRecurringTotal)} / mois
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-base font-semibold text-[#231915] pt-2 border-t border-[#EFE7DC]">
-                    <span>Total</span>
+                    <span>Total aujourd’hui</span>
                     <span className="tabular-nums text-[#5E3A22]">
                       {formatEur(lastOrder.total)}
                     </span>
@@ -951,6 +1005,14 @@ export function CartDrawer() {
                   {shippingFee === 0 ? 'Gratuit' : formatEur(shippingFee)}
                 </span>
               </div>
+              {hasSubscription && (
+                <div className="flex justify-between text-xs text-[#3D5A45] font-medium">
+                  <span>Abonnement mensuel (sans engagement)</span>
+                  <span className="tabular-nums">
+                    {formatEur(monthlyRecurringTotal)} / mois
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between text-base font-semibold text-[#231915] pt-2 border-t border-[#E0D2C0]">
                 <span>Total</span>
                 <span className="text-lg font-serif tabular-nums text-[#5E3A22]">
@@ -975,9 +1037,11 @@ export function CartDrawer() {
                 className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm sm:text-base font-medium text-[#FAF4EC] bg-[#3D5A45] hover:bg-[#2C4433] rounded-lg transition-colors cursor-pointer"
               >
                 <span>
-                  {paymentMethod === 'card'
-                    ? `Confirmer et payer · ${formatEur(total)}`
-                    : `Confirmer la commande · ${formatEur(total)}`}
+                  {hasSubscription && paymentMethod === 'card'
+                    ? `Valider l’abonnement · ${formatEur(total)}`
+                    : paymentMethod === 'card'
+                      ? `Confirmer et payer · ${formatEur(total)}`
+                      : `Confirmer la commande · ${formatEur(total)}`}
                 </span>
               </button>
             )}

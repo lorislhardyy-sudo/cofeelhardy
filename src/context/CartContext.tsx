@@ -9,6 +9,7 @@ import { CoffeeGrind, CoffeeWeight } from '../data/coffeeData';
 
 export type FulfillmentMethod = 'pickup' | 'colissimo' | 'courier';
 export type PaymentMethod = 'card' | 'counter' | 'cod';
+export type PurchaseType = 'one-time' | 'subscription';
 
 export interface CartItem {
   key: string;
@@ -17,7 +18,9 @@ export interface CartItem {
   image: string;
   weight: CoffeeWeight;
   grind: CoffeeGrind;
+  purchaseType: PurchaseType;
   unitPrice: number;
+  regularUnitPrice: number;
   quantity: number;
 }
 
@@ -38,6 +41,8 @@ export interface ConfirmedOrder {
   items: CartItem[];
   fulfillment: FulfillmentMethod;
   paymentMethod: PaymentMethod;
+  hasSubscription: boolean;
+  monthlyRecurringTotal: number;
   subtotal: number;
   shippingFee: number;
   total: number;
@@ -50,6 +55,8 @@ interface CartContextValue {
   fulfillment: FulfillmentMethod;
   lastOrder: ConfirmedOrder | null;
   totalCount: number;
+  hasSubscription: boolean;
+  monthlyRecurringTotal: number;
   subtotal: number;
   shippingFee: number;
   total: number;
@@ -70,6 +77,11 @@ interface CartContextValue {
 
 const STORAGE_KEY = 'coffee_lhardy_cart_v1';
 export const FREE_SHIPPING_THRESHOLD = 45;
+export const SUBSCRIPTION_DISCOUNT_LABEL = '-15 %';
+
+export function getSubscriptionPrice(regularPrice: number): number {
+  return Math.round(regularPrice * 0.85 * 10) / 10;
+}
 
 const CartContext = createContext<CartContextValue | null>(null);
 
@@ -79,11 +91,12 @@ export function formatEur(amount: number): string {
 
 export function computeShippingFee(
   method: FulfillmentMethod,
-  subtotal: number
+  subtotal: number,
+  hasSubscription: boolean
 ): number {
   if (subtotal <= 0 || method === 'pickup') return 0;
   if (method === 'colissimo') {
-    return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 4.9;
+    return hasSubscription || subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 4.9;
   }
   return 7.5;
 }
@@ -94,7 +107,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (!raw) return [];
       const parsed = JSON.parse(raw) as CartItem[];
-      return Array.isArray(parsed) ? parsed : [];
+      if (!Array.isArray(parsed)) return [];
+      return parsed.map((item) => ({
+        ...item,
+        purchaseType: item.purchaseType ?? 'one-time',
+        regularUnitPrice: item.regularUnitPrice ?? item.unitPrice,
+      }));
     } catch {
       return [];
     }
@@ -112,19 +130,35 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [items]);
 
   const totalCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const hasSubscription = items.some(
+    (item) => item.purchaseType === 'subscription'
+  );
+  const monthlyRecurringTotal = items.reduce(
+    (sum, item) =>
+      item.purchaseType === 'subscription'
+        ? sum + item.unitPrice * item.quantity
+        : sum,
+    0
+  );
   const subtotal = items.reduce(
     (sum, item) => sum + item.unitPrice * item.quantity,
     0
   );
-  const shippingFee = computeShippingFee(fulfillment, subtotal);
+  const shippingFee = computeShippingFee(
+    fulfillment,
+    subtotal,
+    hasSubscription
+  );
   const total = subtotal + shippingFee;
-  const freeShippingRemaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+  const freeShippingRemaining = hasSubscription
+    ? 0
+    : Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
 
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
 
   const addItem = (incoming: Omit<CartItem, 'key' | 'quantity'>) => {
-    const key = `${incoming.coffeeId}-${incoming.weight}-${incoming.grind}`;
+    const key = `${incoming.coffeeId}-${incoming.weight}-${incoming.grind}-${incoming.purchaseType}`;
     setLastOrder(null);
     setItems((prev) => {
       const existing = prev.find((item) => item.key === key);
@@ -170,6 +204,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       items: [...items],
       fulfillment,
       paymentMethod,
+      hasSubscription,
+      monthlyRecurringTotal,
       subtotal,
       shippingFee,
       total,
@@ -190,6 +226,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         fulfillment,
         lastOrder,
         totalCount,
+        hasSubscription,
+        monthlyRecurringTotal,
         subtotal,
         shippingFee,
         total,
