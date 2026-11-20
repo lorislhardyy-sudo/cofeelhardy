@@ -7,6 +7,7 @@ import icedAmericanoImg from '../assets/images/iced_americano_1794564998199.jpg'
 import icedLatteImg from '../assets/images/iced_latte_1794564999384.jpg';
 import icedMochaImg from '../assets/images/iced_mocha_1794564999093.jpg';
 import coldBrewImg from '../assets/images/cold_brew_1794564999915.jpg';
+import matchaLatteImg from '../assets/images/matcha_latte_ceremoniel_1795166885519.jpg';
 import chaiLatteImg from '../assets/images/chai_latte_1794565000394.jpg';
 import vanillaLatteImg from '../assets/images/vanilla_latte_1794565000554.jpg';
 import chocolatChaudImg from '../assets/images/chocolat_chaud_1794565000703.jpg';
@@ -19,6 +20,8 @@ import formuleMatinImg from '../assets/images/formule_matin_1794565003216.jpg';
 import toastAvocatImg from '../assets/images/toast_avocat_1794565003724.jpg';
 import croissantComteImg from '../assets/images/croissant_comte_1794565003759.jpg';
 import granolaBowlImg from '../assets/images/granola_bowl_1794565004006.jpg';
+import assemblageMaisonImg from '../assets/images/coffee_lhardy_assemblage_maison_logo_1795170511523.jpg';
+import reserveRoyaleImg from '../assets/images/coffee_lhardy_reserve_royale_logo_1795170512324.jpg';
 
 export type MenuCategoryId =
   | 'all'
@@ -52,9 +55,25 @@ export interface GalleryPhoto {
   category: string;
 }
 
+export type CoffeeWeight = '250g' | '500g' | '1kg';
+export type CoffeeGrind = 'En grains' | 'Moulu Espresso' | 'Moulu Filtre';
+
+export interface HouseCoffeeProduct {
+  id: string;
+  name: string;
+  subtitle: string;
+  origin: string;
+  roast: string;
+  notes: string;
+  description: string;
+  prices: Record<CoffeeWeight, number>;
+  image: string;
+  imageAlt: string;
+}
+
 export const BRAND_CONTACT = {
   name: 'COFFEE LHARDY',
-  address: '8 rue des Champs-Élysées',
+  address: '18 rue Royale',
   district: '75008 Paris, France',
   phone: '07 84 55 63 28',
   phoneHref: 'tel:+33784556328',
@@ -62,9 +81,9 @@ export const BRAND_CONTACT = {
   emailHref: 'mailto:cofeelhardy@gmail.com',
   hours: '8h – 21h · 7/7 j',
   mapsEmbedUrl:
-    'https://www.google.com/maps?q=8+Rue+des+Champs-%C3%89lys%C3%A9es,+75008+Paris,+France&output=embed',
+    'https://www.google.com/maps?q=18+Rue+Royale,+75008+Paris,+France&output=embed',
   mapsDirectionsUrl:
-    'https://www.google.com/maps/dir/?api=1&destination=8+Rue+des+Champs-%C3%89lys%C3%A9es,+75008+Paris,+France',
+    'https://www.google.com/maps/dir/?api=1&destination=18+Rue+Royale,+75008+Paris,+France',
 } as const;
 
 export const SHOP_PHOTOS = {
@@ -124,19 +143,20 @@ export const GALLERY_PHOTOS: GalleryPhoto[] = [
 
 export const MENU_CATEGORIES: MenuCategory[] = [
   {
+    id: 'signature-drinks',
+    label: 'Boissons Signatures',
+    subtitle: 'Recettes de la maison préparées à la commande.',
+  },
+  {
     id: 'hot-coffees',
     label: 'Cafés Chauds',
-    subtitle: 'Grains de spécialité torréfiés avec précision et lait fermier ou végétal.',
+    subtitle:
+      'Grains de spécialité torréfiés avec précision\net lait fermier ou végétal.',
   },
   {
     id: 'iced-coffees',
     label: 'Cafés Glacés',
     subtitle: 'Extractions fraîches servies sur glace cristalline.',
-  },
-  {
-    id: 'signature-drinks',
-    label: 'Boissons Signatures',
-    subtitle: 'Recettes de la maison préparées à la commande.',
   },
   {
     id: 'pastries',
@@ -252,8 +272,8 @@ export const MENU_ITEMS: MenuItem[] = [
     name: 'Matcha Latte Cérémoniel',
     description: 'Thé vert matcha japonais fouetté au bambou, servi chaud ou glacé avec lait velouté.',
     priceEur: '6,50 €',
-    image: SHOP_PHOTOS.drinksAndPastries,
-    imageAlt: 'Matcha latte cérémoniel et boissons signatures sur plateau en bois',
+    image: matchaLatteImg,
+    imageAlt: 'Matcha Latte Cérémoniel vert émeraude avec latte art servi en tasse cannelée',
   },
   {
     id: 'chai-latte',
@@ -366,5 +386,44 @@ export const MENU_ITEMS: MenuItem[] = [
     priceEur: '9,50 €',
     image: granolaBowlImg,
     imageAlt: 'Bol de yaourt grec, granola maison et fruits rouges frais',
+  },
+];
+
+export const HOUSE_COFFEES: HouseCoffeeProduct[] = [
+  {
+    id: 'assemblage-maison',
+    name: 'Assemblage Maison',
+    subtitle: 'Torréfaction Espresso · 100 % Arabica',
+    origin: 'Brésil & Colombie',
+    roast: 'Torréfaction Médium-Foncée',
+    notes: 'Cacao noir · Noisette grillée · Caramel blond',
+    description:
+      'Le café que nous extrayons chaque jour au comptoir du 18 rue Royale. Rond, gourmand et velouté, pensé pour un espresso parfait à la maison.',
+    prices: {
+      '250g': 14.5,
+      '500g': 26.0,
+      '1kg': 48.0,
+    },
+    image: assemblageMaisonImg,
+    imageAlt:
+      'Sachet de café COFFEE LHARDY Assemblage Maison 250 g brun foncé décoré de feuilles et grains de café',
+  },
+  {
+    id: 'reserve-royale',
+    name: 'Réserve Royale',
+    subtitle: 'Pure Origine · Filtre & Espresso Doux',
+    origin: 'Éthiopie Yirgacheffe',
+    roast: 'Torréfaction Claire-Médium',
+    notes: 'Fleur d’oranger · Miel d’acacia · Agrumes',
+    description:
+      'Une récolte d’altitude élégante et lumineuse, torréfiée en petits lots pour révéler toute sa finesse aromatique en tasse.',
+    prices: {
+      '250g': 16.5,
+      '500g': 30.0,
+      '1kg': 55.0,
+    },
+    image: reserveRoyaleImg,
+    imageAlt:
+      'Sachet de café COFFEE LHARDY Réserve Royale 250 g couleur crème et or aux motifs botaniques',
   },
 ];

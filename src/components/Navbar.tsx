@@ -1,26 +1,30 @@
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, ShoppingBag, X } from 'lucide-react';
+import { useCart } from '../context/CartContext';
+import { BrandLogo } from './CoffeeDecor';
 
 const NAV_LINKS = [
   { href: '#accueil', label: 'Accueil' },
-  { href: '#apropos', label: 'À propos' },
   { href: '#menu', label: 'La Carte' },
+  { href: '#cafes-maison', label: 'Cafés Maison' },
   { href: '#galerie', label: 'Galerie' },
   { href: '#contact', label: 'Contact' },
 ] as const;
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { totalCount, openCart } = useCart();
 
   return (
     <header className="sticky top-0 z-40 bg-[#F7F1E8]/95 backdrop-blur-sm border-b border-[#DFD1BF]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-8">
-        {/* Zone 1: Single-line Brand Wordmark */}
+        {/* Zone 1: Single-line Brand Wordmark + Emblem */}
         <a
           href="#accueil"
-          className="font-serif text-xl sm:text-2xl font-semibold tracking-[0.06em] text-[#231915] whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3B2314]"
+          className="inline-flex items-center gap-2.5 font-serif text-xl sm:text-2xl font-semibold tracking-[0.06em] text-[#231915] whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3B2314]"
         >
-          COFFEE LHARDY
+          <BrandLogo variant="light" className="w-8 h-8 sm:w-9 sm:h-9" />
+          <span>COFFEE LHARDY</span>
         </a>
 
         {/* Zone 2: 5 concise single-line text navigation links */}
@@ -39,14 +43,20 @@ export function Navbar() {
           ))}
         </nav>
 
-        {/* Zone 3: 1 primary action (desktop) + mobile menu toggle */}
-        <div className="flex items-center gap-3 shrink-0">
-          <a
-            href="#contact"
-            className="hidden md:inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-[#FAF8F5] bg-[#3B2314] hover:bg-[#2A180D] rounded-lg transition-colors duration-150 whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B2314]"
+        {/* Zone 3: 1 primary action (Panier) + mobile menu toggle */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <button
+            type="button"
+            onClick={openCart}
+            aria-label={`Ouvrir le panier (${totalCount} ${totalCount > 1 ? 'articles' : 'article'})`}
+            className="inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 text-sm font-medium text-[#FAF8F5] bg-[#3B2314] hover:bg-[#2A180D] rounded-lg transition-colors duration-150 whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B2314]"
           >
-            Nous trouver
-          </a>
+            <ShoppingBag className="w-4 h-4" aria-hidden="true" />
+            <span>Panier</span>
+            {totalCount > 0 && (
+              <span className="tabular-nums font-semibold">({totalCount})</span>
+            )}
+          </button>
 
           <button
             type="button"
@@ -56,7 +66,11 @@ export function Navbar() {
             aria-label={mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
             className="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-lg text-[#231915] hover:bg-[#EFE9E0] transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B2314]"
           >
-            {mobileOpen ? <X className="w-5 h-5" aria-hidden="true" /> : <Menu className="w-5 h-5" aria-hidden="true" />}
+            {mobileOpen ? (
+              <X className="w-5 h-5" aria-hidden="true" />
+            ) : (
+              <Menu className="w-5 h-5" aria-hidden="true" />
+            )}
           </button>
         </div>
       </div>
@@ -78,15 +92,6 @@ export function Navbar() {
               {link.label}
             </a>
           ))}
-          <div className="pt-2">
-            <a
-              href="#menu"
-              onClick={() => setMobileOpen(false)}
-              className="block w-full text-center px-4 py-3 text-sm font-medium text-[#FAF8F5] bg-[#3B2314] hover:bg-[#2A180D] rounded-lg transition-colors duration-150"
-            >
-              Découvrir notre carte
-            </a>
-          </div>
         </nav>
       )}
     </header>

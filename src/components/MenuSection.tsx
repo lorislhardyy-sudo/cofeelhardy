@@ -42,13 +42,13 @@ const CATEGORY_THEMES: Record<
     tabActive: 'bg-[#395C53] text-[#FAF4EC]',
   },
   'signature-drinks': {
-    accentText: 'text-[#3D5A45]',
-    cardBg: 'bg-[#F4F8F4]',
-    cardBorder: 'border-[#C7D8CA] hover:border-[#5D8768]',
-    thumbBorder: 'border-[#9FBDAA]',
-    priceColor: 'text-[#34503B]',
-    iconBg: 'bg-[#E1ECE3] text-[#3D5A45]',
-    tabActive: 'bg-[#3D5A45] text-[#FAF4EC]',
+    accentText: 'text-[#8A6114]',
+    cardBg: 'bg-gradient-to-br from-[#F7E7B2] via-[#EED27A] to-[#E5C158]',
+    cardBorder: 'border-[#B8891E] hover:border-[#8F650D]',
+    thumbBorder: 'border-[#9C7216]',
+    priceColor: 'text-[#3B2314]',
+    iconBg: 'bg-[#EED27A] text-[#5E3A08]',
+    tabActive: 'bg-[#9E731B] text-[#FAF4EC]',
   },
   pastries: {
     accentText: 'text-[#8F5524]',
@@ -109,8 +109,8 @@ export function MenuSection() {
 
           <div className="text-sm text-[#5A4D44] max-w-[48ch] leading-relaxed space-y-1 lg:text-right">
             <p className="font-medium text-[#231915]">
-              Préparé par nos baristas professionnels · Note de{' '}
-              <span className="inline-flex items-center gap-1 font-semibold text-[#5E3A22] tabular-nums">
+              Préparé par nos baristas professionnels · Note&nbsp;de{' '}
+              <span className="inline-flex items-center gap-1 font-semibold text-[#5E3A22] tabular-nums whitespace-nowrap">
                 4,9 / 5
                 <Star
                   className="w-3.5 h-3.5 fill-[#B87D4B] text-[#B87D4B]"
@@ -119,32 +119,13 @@ export function MenuSection() {
               </span>
             </p>
             <p className="text-xs text-[#6E6259]">
-              Tarifs indicatifs en euros, confirmés sur place.
+              Tarifs indicatifs en euros, confirmés sur&nbsp;place.
             </p>
           </div>
         </div>
 
-        {/* Visual Showcase Strip using actual supplied product photos */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          <figure className="rounded-xl overflow-hidden border border-[#D4C0A8] bg-[#FCF8F2]">
-            <div className="aspect-[16/10] overflow-hidden bg-[#EFE9E0]">
-              <ImageWithFallback
-                src={SHOP_PHOTOS.latteTray}
-                alt="Cappuccinos et latte art en tasses cannelées servis avec un cookie maison"
-                loading="lazy"
-                className="w-full h-full object-cover object-center"
-              />
-            </div>
-            <figcaption className="px-5 py-3.5 text-sm text-[#5A4D44] border-t border-[#E5DDD3] flex items-center justify-between gap-4">
-              <span className="font-medium text-[#5E3A22]">
-                Cafés chauds &amp; latte art
-              </span>
-              <span className="text-xs text-[#6E6259] whitespace-nowrap">
-                Sur place ou à emporter
-              </span>
-            </figcaption>
-          </figure>
-
+        {/* Visual Showcase using supplied product photo */}
+        <div className="max-w-3xl mx-auto mb-12">
           <figure className="rounded-xl overflow-hidden border border-[#C7D8CA] bg-[#F7FAF7]">
             <div className="aspect-[16/10] overflow-hidden bg-[#EFE9E0]">
               <ImageWithFallback
@@ -154,13 +135,10 @@ export function MenuSection() {
                 className="w-full h-full object-cover object-center"
               />
             </div>
-            <figcaption className="px-5 py-3.5 text-sm text-[#5A4D44] border-t border-[#D6E3D8] flex items-center justify-between gap-4">
-              <span className="font-medium text-[#3D5A45]">
-                Matcha, brioche feuilletée &amp; cookies
-              </span>
-              <span className="text-xs text-[#6E6259] whitespace-nowrap">
-                Préparés chaque matin
-              </span>
+            <figcaption className="px-5 py-3.5 text-sm sm:text-base text-[#3D5A45] font-medium border-t border-[#D6E3D8] text-center">
+              Au comptoir, Jérémy, barista&nbsp;expert,
+              <br />
+              vous prépare votre café à la commande avec précision et&nbsp;savoir-faire.
             </figcaption>
           </figure>
         </div>
@@ -169,7 +147,7 @@ export function MenuSection() {
         <div
           role="tablist"
           aria-label="Catégories du menu"
-          className="flex items-center gap-2 overflow-x-auto pb-3 mb-12 border-b border-[#D4C0A8]"
+          className="flex items-center gap-2 overflow-x-auto pt-1 pb-3 mb-12 border-b border-[#D4C0A8]"
         >
           <button
             type="button"
@@ -187,6 +165,7 @@ export function MenuSection() {
 
           {MENU_CATEGORIES.map((category) => {
             const isActive = activeCategory === category.id;
+            const isSignature = category.id === 'signature-drinks';
             const theme = CATEGORY_THEMES[category.id];
             return (
               <button
@@ -195,10 +174,16 @@ export function MenuSection() {
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => setActiveCategory(category.id)}
-                className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors duration-150 whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B2314] ${
-                  isActive
-                    ? theme.tabActive
-                    : 'bg-[#FCF8F2]/80 text-[#5A4D44] hover:text-[#231915] hover:bg-[#FCF8F2]'
+                className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-150 whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B2314] ${
+                  isSignature
+                    ? `gold-shimmer-card bg-gradient-to-br from-[#F7E7B2] via-[#EED27A] to-[#E5C158] text-[#3B2314] border ${
+                        isActive
+                          ? 'border-[#3B2314] ring-1 ring-[#3B2314] font-semibold'
+                          : 'border-[#B8891E] hover:border-[#8F650D]'
+                      }`
+                    : isActive
+                      ? theme.tabActive
+                      : 'bg-[#FCF8F2]/80 text-[#5A4D44] hover:text-[#231915] hover:bg-[#FCF8F2]'
                 }`}
               >
                 <CategoryIcon categoryId={category.id} />
@@ -232,49 +217,53 @@ export function MenuSection() {
                     >
                       {category.label}
                     </h3>
-                    <p className="text-sm text-[#5A4D44] mt-0.5">
+                    <p className="text-sm text-[#5A4D44] mt-0.5 whitespace-pre-line">
                       {category.subtitle}
                     </p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {items.map((item) => (
                     <div
                       key={item.id}
-                      className={`p-4 rounded-xl border transition-colors duration-150 flex items-center justify-between gap-4 ${theme.cardBg} ${theme.cardBorder}`}
+                      className={`p-4 sm:p-5 rounded-xl border transition-all duration-200 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5 ${theme.cardBg} ${theme.cardBorder} ${
+                        category.id === 'signature-drinks'
+                          ? 'gold-shimmer-card'
+                          : ''
+                      }`}
                     >
-                      <div className="flex items-center gap-4 min-w-0">
-                        <div
-                          className={`w-20 h-20 sm:w-[88px] sm:h-[88px] shrink-0 rounded-lg overflow-hidden border-2 bg-[#EFE9E0] ${theme.thumbBorder}`}
-                        >
-                          <ImageWithFallback
-                            src={item.image}
-                            alt={item.imageAlt}
-                            loading="lazy"
-                            className="w-full h-full object-cover object-center"
-                          />
-                        </div>
-
-                        <div className="min-w-0">
-                          <h4 className="text-base font-medium text-[#231915]">
-                            {item.name}
-                          </h4>
-                          <p className="text-sm text-[#5A4D44] mt-1 leading-relaxed">
-                            {item.description}
-                          </p>
-                        </div>
+                      <div
+                        className={`w-full aspect-[4/3] sm:aspect-square sm:w-36 sm:h-36 lg:w-40 lg:h-40 shrink-0 rounded-lg overflow-hidden border-2 bg-[#EFE9E0] ${theme.thumbBorder}`}
+                      >
+                        <ImageWithFallback
+                          src={item.image}
+                          alt={item.imageAlt}
+                          loading="lazy"
+                          className="w-full h-full object-cover object-center"
+                        />
                       </div>
 
-                      <div className="shrink-0 text-right pl-2">
-                        <span
-                          className={`text-base font-semibold tabular-nums whitespace-nowrap ${theme.priceColor}`}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-baseline justify-between gap-3">
+                          <h4 className="text-base sm:text-lg font-medium text-[#231915]">
+                            {item.name}
+                          </h4>
+                          <span
+                            className={`text-base sm:text-lg font-semibold tabular-nums whitespace-nowrap shrink-0 ${theme.priceColor}`}
+                          >
+                            {item.priceEur}
+                          </span>
+                        </div>
+                        <p
+                          className={`text-sm mt-1.5 leading-relaxed ${
+                            category.id === 'signature-drinks'
+                              ? 'text-[#3E2C1E]'
+                              : 'text-[#5A4D44]'
+                          }`}
                         >
-                          {item.priceEur}
-                        </span>
-                        <span className="block text-[11px] text-[#6E6259] mt-0.5 whitespace-nowrap">
-                          indicatif
-                        </span>
+                          {item.description}
+                        </p>
                       </div>
                     </div>
                   ))}

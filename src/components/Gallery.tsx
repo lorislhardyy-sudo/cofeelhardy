@@ -150,7 +150,7 @@ export function Gallery() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
         {/* Section Header */}
-        <div className="max-w-2xl mx-auto text-center mb-12">
+        <div className="max-w-3xl mx-auto text-center mb-12">
           <p className="text-sm font-medium text-[#3D5A45] tracking-wide mb-2">
             Savoir-faire en Vidéo
           </p>
@@ -158,8 +158,9 @@ export function Gallery() {
             L’art du chaud et du glacé chez COFFEE LHARDY
           </h2>
           <p className="text-base text-[#5A4D44] mt-3 leading-relaxed">
-            Du versement précis de notre latte art au nuage de crème sur
-            glaçons, retrouvez deux instants signatures préparés sous vos yeux.
+            Du versement précis de notre latte art au nuage de crème sur&nbsp;glaçons,
+            <br />
+            retrouvez deux instants signatures préparés sous vos&nbsp;yeux.
           </p>
         </div>
 

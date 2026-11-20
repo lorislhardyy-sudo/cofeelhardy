@@ -1,9 +1,11 @@
 import { BRAND_CONTACT } from '../data/coffeeData';
+import { BrandLogo } from './CoffeeDecor';
 
 const FOOTER_LINKS = [
   { href: '#accueil', label: 'Accueil' },
   { href: '#apropos', label: 'À propos' },
   { href: '#menu', label: 'La Carte' },
+  { href: '#cafes-maison', label: 'Cafés Maison' },
   { href: '#galerie', label: 'Galerie' },
   { href: '#contact', label: 'Contact' },
 ] as const;
@@ -17,13 +19,15 @@ export function Footer() {
           <div className="md:col-span-5">
             <a
               href="#accueil"
-              className="font-serif text-2xl font-semibold tracking-[0.06em] text-[#FAF8F5]"
+              className="inline-flex items-center gap-3 font-serif text-2xl font-semibold tracking-[0.06em] text-[#FAF8F5]"
             >
-              {BRAND_CONTACT.name}
+              <BrandLogo variant="dark" className="w-9 h-9" />
+              <span>{BRAND_CONTACT.name}</span>
             </a>
-            <p className="text-sm text-[#C8BEB4] mt-3 max-w-[38ch] leading-relaxed">
-              Votre pause café au cœur des Champs-Élysées. Cafés de spécialité,
-              boissons signatures et pâtisseries du matin.
+            <p className="text-sm text-[#C8BEB4] mt-3 max-w-[40ch] leading-relaxed">
+              Votre pause café rue&nbsp;Royale.
+              <br />
+              Cafés de spécialité, boissons maison et pâtisseries du&nbsp;matin.
             </p>
             <p className="text-sm text-[#A89A8E] mt-4">
               {BRAND_CONTACT.address}, {BRAND_CONTACT.district}
@@ -93,7 +97,7 @@ export function Footer() {
 
         <div className="pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-[#A89A8E]">
           <p>© {new Date().getFullYear()} COFFEE LHARDY. Tous droits réservés.</p>
-          <p>8 rue des Champs-Élysées, 75008 Paris, France</p>
+          <p>18 rue Royale, 75008 Paris, France</p>
         </div>
       </div>
     </footer>

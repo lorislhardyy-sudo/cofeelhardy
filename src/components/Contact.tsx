@@ -15,11 +15,12 @@ export function Contact() {
             Localisation &amp; Contact
           </p>
           <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-[#231915]">
-            Nous rendre visite sur les Champs-Élysées
+            Nous rendre visite rue Royale
           </h2>
           <p className="text-base text-[#5A4D44] mt-3 leading-relaxed">
-            Retrouvez COFFEE LHARDY au cœur du 8e arrondissement de Paris, 7/7 j
-            de 8h à 21h.
+            Retrouvez COFFEE LHARDY au cœur du 8e arrondissement de&nbsp;Paris.
+            <br />
+            7/7 j de 8h à&nbsp;21h.
           </p>
         </div>
 
@@ -114,7 +115,7 @@ export function Contact() {
           <div className="lg:col-span-7">
             <div className="h-full min-h-[340px] sm:min-h-[420px] rounded-xl overflow-hidden border border-[#DDD3C7] bg-[#EFE9E0]">
               <iframe
-                title="Carte Google Maps — 8 rue des Champs-Élysées, 75008 Paris, France"
+                title="Carte Google Maps — 18 rue Royale, 75008 Paris, France"
                 src={BRAND_CONTACT.mapsEmbedUrl}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"

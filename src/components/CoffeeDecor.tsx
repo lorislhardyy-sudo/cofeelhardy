@@ -1,3 +1,118 @@
+import { useId } from 'react';
+
+export function BrandLogo({
+  variant = 'light',
+  className = '',
+}: {
+  variant?: 'light' | 'dark';
+  className?: string;
+}) {
+  const uid = useId();
+  const gradId = `gold-bean-grad-${variant}-${uid}`;
+  const ringStroke = variant === 'dark' ? '#E5BA5C' : '#A67818';
+  const outlineStroke = variant === 'dark' ? '#F6DE92' : '#7D540B';
+  const cleftStroke = variant === 'dark' ? '#1D1410' : '#4A2E14';
+
+  return (
+    <svg
+      aria-hidden="true"
+      width="36"
+      height="36"
+      viewBox="0 0 40 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={`shrink-0 ${className}`}
+    >
+      <defs>
+        <linearGradient
+          id={gradId}
+          x1="8"
+          y1="6"
+          x2="32"
+          y2="34"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0%" stopColor="#FDF0B4" />
+          <stop offset="42%" stopColor="#E6B94A" />
+          <stop offset="78%" stopColor="#C28E22" />
+          <stop offset="100%" stopColor="#8F630D" />
+        </linearGradient>
+      </defs>
+
+      {/* Delicate brushed gold seal ring */}
+      <circle
+        cx="20"
+        cy="20"
+        r="17.5"
+        stroke={ringStroke}
+        strokeOpacity="0.45"
+        strokeWidth="1"
+      />
+
+      {/* Sculpted golden coffee bean */}
+      <g transform="rotate(-22 20 20)">
+        <ellipse
+          cx="20"
+          cy="20"
+          rx="10"
+          ry="14"
+          fill={`url(#${gradId})`}
+          stroke={outlineStroke}
+          strokeWidth="1.1"
+        />
+
+        {/* Specular gold highlight along left curve */}
+        <path
+          d="M13.8 12.2C12.3 16.5 12.3 23.2 13.9 27.6"
+          stroke="#FFF7D4"
+          strokeOpacity="0.72"
+          strokeWidth="1.2"
+          strokeLinecap="round"
+        />
+
+        {/* Subtle S-curve coffee bean roast cleft behind the signature */}
+        <path
+          d="M19.8 7.2C17.4 13 22.8 25.5 20.2 32.8"
+          stroke={cleftStroke}
+          strokeOpacity="0.38"
+          strokeWidth="1.35"
+          strokeLinecap="round"
+        />
+      </g>
+
+      {/* Engraved calligraphic "CL" signature flourish across the golden bean */}
+      <g transform="rotate(-7 20 20)">
+        {/* Subtle bright gold bevel */}
+        <path
+          d="M19.2 16.6C16.2 15.8 13.6 18.2 14.1 21.4C14.5 23.8 17.5 24.1 19.6 21.8C21.2 20 22.8 16.4 22.4 14.6C22.1 13.6 20.9 14.4 20.5 16.5L19.6 22.8C19.4 23.9 20.4 24.2 21.8 23.3C23.5 22.2 25.4 21.4 27.4 21.6"
+          stroke="#FFF6CE"
+          strokeOpacity="0.65"
+          strokeWidth="1.9"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          transform="translate(0.4 0.5)"
+        />
+        {/* Deep espresso engraved ink */}
+        <path
+          d="M19.2 16.6C16.2 15.8 13.6 18.2 14.1 21.4C14.5 23.8 17.5 24.1 19.6 21.8C21.2 20 22.8 16.4 22.4 14.6C22.1 13.6 20.9 14.4 20.5 16.5L19.6 22.8C19.4 23.9 20.4 24.2 21.8 23.3C23.5 22.2 25.4 21.4 27.4 21.6"
+          stroke="#2A170B"
+          strokeWidth="1.45"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        {/* Signature underline sweep */}
+        <path
+          d="M14.4 25.7C18.2 24.6 22.8 24.4 26.8 24.7"
+          stroke="#2A170B"
+          strokeOpacity="0.85"
+          strokeWidth="1"
+          strokeLinecap="round"
+        />
+      </g>
+    </svg>
+  );
+}
+
 interface CoffeeBranchDividerProps {
   className?: string;
 }

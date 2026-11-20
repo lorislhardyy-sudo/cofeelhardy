@@ -1,8 +1,12 @@
+import { useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { SHOP_PHOTOS } from '../data/coffeeData';
-import { BotanicalCorner, CoffeeBranchDivider } from './CoffeeDecor';
+import { BotanicalCorner } from './CoffeeDecor';
 import { ImageWithFallback } from './ImageWithFallback';
 
 export function About() {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   return (
     <section
       id="apropos"
@@ -14,64 +18,61 @@ export function About() {
       />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-8 lg:gap-14 items-stretch">
-          {/* Left Column: Simple & Authentic Story */}
+          {/* Left Column: Concise 11-Year Story with Expandable Continuation */}
           <div className="sm:col-span-6 flex flex-col justify-center">
             <p className="text-sm font-medium text-[#3D5A45] tracking-wide mb-3">
               À propos de la maison
             </p>
 
-            <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-[#231915] leading-tight mb-6">
-              L’art du café de spécialité à deux pas des Champs-Élysées
+            <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-[#231915] leading-tight mb-5">
+              Notre histoire, 11 ans de passion
             </h2>
 
-            <div className="space-y-4 text-base text-[#5A4D44] leading-relaxed max-w-[60ch]">
+            <div className="space-y-4 text-base text-[#5A4D44] leading-relaxed max-w-[54ch]">
               <p>
-                COFFEE LHARDY est un coffee shop moderne situé au 8 rue des
-                Champs-Élysées. Nous vous accueillons dans un lieu calme et
-                chaleureux, idéal pour faire une vraie pause café à Paris.
+                Cela fait maintenant 11 ans que nous faisons ce métier avec la
+                même envie : servir un vrai café de qualité, préparé avec soin
+                et dans une ambiance chaleureuse.
               </p>
-              <p>
-                Nous préparons chaque boisson devant vous avec du café de
-                spécialité et du matcha fouetté à la main, accompagnés de
-                viennoiseries et pâtisseries fraîches chaque matin, sur place ou
-                à emporter.
-              </p>
+
+              {isExpanded && (
+                <div className="space-y-4">
+                  <p>
+                    Tout a commencé par l’amour du grain bien torréfié et des
+                    extractions précises. Pendant ces 11 années, nous avons
+                    affiné notre savoir-faire tasse après tasse, au contact de
+                    clients fidèles qui aiment prendre le temps d’un bon café.
+                  </p>
+                  <p>
+                    Aujourd’hui au 18 rue Royale, COFFEE LHARDY réunit toute
+                    cette expérience : des boissons préparées à la commande, du
+                    matcha cérémoniel et des pâtisseries fraîches chaque matin,
+                    sur place ou à emporter.
+                  </p>
+                </div>
+              )}
             </div>
 
-            <CoffeeBranchDivider className="mt-8 mb-6" />
-
-            {/* Clean Hairline-Separated Pillars */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div>
-                <p className="font-serif text-lg font-semibold text-[#5E3A22]">
-                  Grains sélectionnés
-                </p>
-                <p className="text-sm text-[#6E6259] mt-1">
-                  Extraction espresso et filtres maîtrisés
-                </p>
-              </div>
-              <div>
-                <p className="font-serif text-lg font-semibold text-[#3D5A45]">
-                  Pâtisseries du jour
-                </p>
-                <p className="text-sm text-[#6E6259] mt-1">
-                  Viennoiseries pur beurre et cookies maison
-                </p>
-              </div>
-              <div>
-                <p className="font-serif text-lg font-semibold text-[#8C5A32]">
-                  Paris 8e
-                </p>
-                <p className="text-sm text-[#6E6259] mt-1">
-                  Sur place au comptoir ou à emporter
-                </p>
-              </div>
+            <div className="mt-6">
+              <button
+                type="button"
+                aria-expanded={isExpanded}
+                onClick={() => setIsExpanded((prev) => !prev)}
+                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[#3B2314] bg-[#EFE3D2] hover:bg-[#E5D4BD] border border-[#D4C0A8] rounded-lg transition-colors duration-150 whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B2314]"
+              >
+                <span>{isExpanded ? 'Réduire' : 'Afficher la suite'}</span>
+                {isExpanded ? (
+                  <ChevronUp className="w-4 h-4" aria-hidden="true" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" aria-hidden="true" />
+                )}
+              </button>
             </div>
           </div>
 
           {/* Right Column: Authentic Barista Craftsmanship Photo */}
           <div className="sm:col-span-6">
-            <div className="h-full min-h-[280px] sm:min-h-[380px] rounded-xl overflow-hidden border border-[#E5DDD3] bg-[#EFE9E0]">
+            <div className="h-full min-h-[280px] sm:min-h-[340px] rounded-xl overflow-hidden border border-[#E5DDD3] bg-[#EFE9E0]">
               <ImageWithFallback
                 src={SHOP_PHOTOS.barista}
                 alt="Barista préparant un espresso de spécialité chez Coffee Lhardy à Paris"

@@ -22,17 +22,19 @@ export function Hero() {
           {/* Left Column: Editorial Headline & Primary CTA */}
           <div className="lg:col-span-5 flex flex-col justify-center py-2 lg:py-8">
             <p className="text-sm font-medium text-[#D7A876] tracking-wide mb-4">
-              Champs-Élysées · 75008 Paris
+              Rue Royale · 75008 Paris
             </p>
 
             <h1 className="font-serif text-[clamp(2.5rem,4.5vw,4rem)] font-semibold leading-[1.08] tracking-tight text-[#FAF4EC] mb-5">
               Bienvenue chez Coffee Lhardy
             </h1>
 
-            <p className="text-base sm:text-lg text-[#DDD0C3] leading-relaxed max-w-[44ch] mb-8">
-              Votre pause café au cœur des Champs-Élysées. Cafés de spécialité,
-              boissons signatures et viennoiseries dorées dans une atmosphère
-              chaleureuse et épurée.
+            <p className="text-base sm:text-[17px] text-[#DDD0C3] leading-relaxed max-w-[58ch] mb-8">
+              Votre pause café rue&nbsp;Royale.
+              <br />
+              Cafés de spécialité, boissons maison et pâtisseries&nbsp;fraîches
+              <br />
+              dans un lieu&nbsp;chaleureux.
             </p>
 
             <div className="flex flex-wrap items-center gap-4">
@@ -58,7 +60,7 @@ export function Hero() {
             <div className="relative h-full min-h-[320px] sm:min-h-[420px] lg:min-h-[540px] rounded-xl overflow-hidden border border-[#4A3327] bg-[#1B100B]">
               <ImageWithFallback
                 src={SHOP_PHOTOS.interiorBar}
-                alt="Intérieur du salon COFFEE LHARDY sur les Champs-Élysées avec comptoir en bois cannelé et vitrine de viennoiseries"
+                alt="Intérieur du salon COFFEE LHARDY rue Royale à Paris avec comptoir en bois cannelé et vitrine de viennoiseries"
                 loading="eager"
                 className="w-full h-full object-cover object-center"
               />
